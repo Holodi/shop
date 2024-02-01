@@ -1,6 +1,6 @@
 import sqlite3
 
-from flask import Flask, request, jsonify, render_template, g
+from flask import Flask, request, jsonify, render_template, session, g
 
 app = Flask(__name__)
 
@@ -21,6 +21,24 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+# Функція для отримання загальної суми кошика
+def get_cart_total():
+    cart = session.get('cart', {})
+    total = 0.0
+
+    # Логіка для отримання цін товарів з бази даних чи іншого джерела
+    item_prices = {
+        1: 10.0,
+        2: 20.0,
+    }
+
+    for item_id, quantity in cart.items():
+        if item_id in item_prices:
+            total += item_prices[item_id] * quantity
+
+    return total
+
 
 # Обробка реєстрації користувача
 
