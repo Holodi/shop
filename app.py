@@ -1,11 +1,28 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 import sqlite3
+from database_operations import execute_query, insert_data, update_data, delete_data, select_data
 
 app = Flask(__name__)
 
+DATABASE_PATH = 'identifier.sqlite.db'
+
+# Самописний менеджер контексту
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE_PATH)
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+# Обробка реєстрації користувача
 @app.route('/register', methods=['POST'])
 def register():
-    # Обробка реєстрації користувача
+
     return "User registered successfully"
 
 @app.route('/login', methods=['POST'])
