@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список товарів</title>
+</head>
+<body>
+    <h1>Список товарів</h1>
+    <ul>
+        {% for item in items %}
+            <li>
+                <a href="{{ url_for('get_item', item_id=item.item_id) }}">{{ item.name }}</a>
+                - {{ item.description }} - {{ item.price }} грн
+            </li>
+        {% endfor %}
+    </ul>
+    <p>Фільтри або категорії товарів:</p>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина</title>
+</head>
+<body>
+    <h1>Корзина</h1>
+    <ul>
+        {% for item in cart_items %}
+            <li>
+                {{ item.name }} - Кількість: {{ item.quantity }} - Вартість: {{ item.price * item.quantity }} грн
+                <form action="{{ url_for('update_cart') }}" method="post">
+                    <input type="hidden" name="item_id" value="{{ item.item_id }}">
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                    <button type="submit">Оновити</button>
+                </form>
+                <form action="{{ url_for('remove_from_cart') }}" method="post">
+                    <input type="hidden" name="item_id" value="{{ item.item_id }}">
+                    <button type="submit">Видалити</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Загальна вартість: {{ total_price }} грн</h2>
+    <form action="{{ url_for('checkout') }}" method="post">
+        <!-- Форма оформлення замовлення тут -->
+        <button type="submit">Оформити замовлення</button>
+    </form>
+</body>
+</html>

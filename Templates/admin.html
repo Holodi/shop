@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін-панель</title>
+</head>
+<body>
+    <h1>Адмін-панель</h1>
+    <h2>Товари</h2>
+    <ul>
+        {% for item in all_items %}
+            <li>
+                {{ item.name }} - {{ item.description }} - {{ item.price }} грн
+                <form action="{{ url_for('admin_update_item', item_id=item.item_id) }}" method="post">
+                    <!-- Форма для редагування товару тут -->
+                    <button type="submit">Редагувати</button>
+                </form>
+                <form action="{{ url_for('admin_delete_item', item_id=item.item_id) }}" method="post">
+                    <!-- Форма для видалення товару тут -->
+                    <button type="submit">Видалити</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Користувачі</h2>
+    <ul>
+        {% for user in all_users %}
+            <li>
+                {{ user.login }} - {{ user.name }} {{ user.surname }}
+                <form action="{{ url_for('admin_update_user', user_login=user.login) }}" method="post">
+                    <!-- Форма для редагування користувача тут -->
+                    <button type="submit">Редагувати</button>
+                </form>
+                <form action="{{ url_for('admin_delete_user', user_login=user.login) }}" method="post">
+                    <!-- Форма для видалення користувача тут -->
+                    <button type="submit">Видалити</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список улюблених товарів</title>
+</head>
+<body>
+    <h1>Список улюблених товарів</h1>
+    <ul>
+        {% for favorite in favorites %}
+            <li>
+                {{ favorite.name }} - {{ favorite.description }} - {{ favorite.price }} грн
+                <form action="{{ url_for('remove_from_favorites') }}" method="post">
+                    <input type="hidden" name="item_id" value="{{ favorite.item_id }}">
+                    <button type="submit">Видалити з улюблених</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

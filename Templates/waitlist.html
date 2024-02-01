@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список очікувань</title>
+</head>
+<body>
+    <h1>Список очікувань</h1>
+    <ul>
+        {% for item in waitlist_items %}
+            <li>
+                {{ item.name }} - {{ item.description }} - {{ item.price }} грн
+                <form action="{{ url_for('remove_from_waitlist', item_id=item.item_id) }}" method="post">
+                    <button type="submit">Видалити з очікувань</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
