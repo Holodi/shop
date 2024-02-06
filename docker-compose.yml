@@ -1,6 +1,19 @@
 version: '3'
+
 services:
   web:
     build: .
     ports:
       - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql://postgres:your_postgres_password@postgres:5432/your_database_name"
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_postgres_password
+      POSTGRES_DB: your_database_name

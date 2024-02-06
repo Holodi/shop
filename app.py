@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, render_template, session, g
 from flask_sqlalchemy import SQLAlchemy
 from models import Review, Cart, Favorites, Waitlist, Comparison, User, Order, Items
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///identifier.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///identifier.sqlite')
 db = SQLAlchemy(app)
 
 app.secret_key = 1111

@@ -1,10 +1,11 @@
-import sqlite3
+import psycopg2
+from psycopg2 import sql
 
-DATABASE_PATH = 'identifier.sqlite'
+DATABASE_URL = "postgresql://admin:admin@5000/identifier.sqlite"
 
 def execute_query(query, parameters=None):
     try:
-        with sqlite3.connect(DATABASE_PATH) as connection:
+        with psycopg2.connect(DATABASE_URL) as connection:
             cursor = connection.cursor()
             if parameters:
                 cursor.execute(query, parameters)
@@ -16,21 +17,22 @@ def execute_query(query, parameters=None):
         raise e
 
 def insert_data(table, data):
-    query = f"INSERT INTO {table} VALUES ({', '.join(['?' for _ in range(len(data))])})"
+    placeholders = ', '.join(['%s' for _ in range(len(data))])
+    query = sql.SQL(f"INSERT INTO {table} VALUES ({placeholders})")
     execute_query(query, data)
 
 def update_data(table, set_values, condition):
-    set_clause = ', '.join([f"{key} = ?" for key in set_values.keys()])
-    query = f"UPDATE {table} SET {set_clause} WHERE {condition}"
+    set_clause = sql.SQL(', '.join([sql.Identifier(key).as_sql(cursor=None)[0] + ' = %s' for key in set_values.keys()]))
+    query = sql.SQL(f"UPDATE {table} SET {set_clause} WHERE {condition}")
     execute_query(query, list(set_values.values()))
 
 def delete_data(table, condition):
-    query = f"DELETE FROM {table} WHERE {condition}"
+    query = sql.SQL(f"DELETE FROM {table} WHERE {sql.SQL(condition)}")
     execute_query(query)
 
 def select_data(table, columns="*", condition=None):
     if condition:
-        query = f"SELECT {columns} FROM {table} WHERE {condition}"
+        query = sql.SQL(f"SELECT {sql.SQL(columns)} FROM {table} WHERE {sql.SQL(condition)}")
     else:
-        query = f"SELECT {columns} FROM {table}"
+        query = sql.SQL(f"SELECT {sql.SQL(columns)} FROM {table}")
     return execute_query(query)
