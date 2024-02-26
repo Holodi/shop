@@ -1,19 +1,15 @@
-version: '3'
+version: '3.8'
 
 services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: "postgresql://postgres:your_postgres_password@postgres:5432/your_database_name"
-
-  postgres:
+  db:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: your_database_name
+      POSTGRES_USER: kholod
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: hillel_shop
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+

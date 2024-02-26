@@ -4,18 +4,21 @@ from models import Review, Cart, Favorites, Waitlist, Comparison, User, Order, I
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///identifier.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://kholod:12345@localhost/hillel_shop')
 db = SQLAlchemy(app)
 
 app.secret_key = 1111
+
 
 # Самописний менеджер контексту
 def before_request():
     g.db = db.create_all()
 
+
 @app.teardown_request
 def teardown_request(exception=None):
     db.session.remove()
+
 
 # Функція для отримання загальної суми кошика
 def get_cart_total(items):
@@ -38,6 +41,7 @@ def get_cart_total(items):
 @app.route('/register', methods=['POST'])
 def register():
     return render_template('register.html')
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -162,12 +166,14 @@ def fill_order_form():
     # Повернути результат у форматі JSON
     return render_template('order_form.html', message="Provide shipping details and payment information")
 
+
 # shop/favorites/<list_id> [GET]
 @app.route('/shop/favorites/<int:list_id>', methods=['GET'])
 def get_favorite_list(list_id):
     # Логіка отримання вмісту списку улюблених товарів за list_id
     favorite_items = Favorites.query.filter_by(list_id=list_id).all()
     return render_template('favorites.html', list_id=list_id, favorites=favorite_items)
+
 
 # shop/favorites/<list_id> [PUT]
 @app.route('/shop/favorites/<int:list_id>', methods=['PUT'])
@@ -198,7 +204,6 @@ def create_favorite_list():
     new_favorite_items = data.get('favorites', [])
 
     # Створити новий список улюблених товарів в базі даних
-    # ...
 
     return render_template('favorites_result.html', message="New favorite list created successfully",
                            favorites=new_favorite_items)
@@ -241,6 +246,7 @@ def create_item():
     data = request.json
     # Створити новий товар в базі даних
     return render_template('item_result.html', message="New item created successfully")
+
 
 # shop/favorites/<list_id> [PUT]
 @app.route('/shop/favorites/<int:list_id>', methods=['PUT'])
@@ -314,6 +320,7 @@ def create_item():
 
     return jsonify({"message": "New item created successfully"})
 
+
 @app.route('/admin/items', methods=['GET'])
 def get_all_items():
     items = Items.query.all()
@@ -382,6 +389,7 @@ def get_admin_statistics():
     statistics = {"total_items": total_items, "total_orders": total_orders}
     return render_template('admin_statistics.html', statistics=statistics)
 
+
 # user [PUT]
 @app.route('/user', methods=['PUT'])
 def update_user_profile():
@@ -395,11 +403,13 @@ def update_user_profile():
     else:
         return render_template('user_not_found.html')
 
+
 # shop/compare/<cmp_id> [GET]
 @app.route('/shop/compare/<int:cmp_id>', methods=['GET'])
 def get_comparison(cmp_id):
     comparison_items = Comparison.query.filter_by(cmp_id=cmp_id).all()
     return render_template('comparison_result.html', cmp_id=cmp_id, comparison=comparison_items)
+
 
 # shop/compare/<cmp_id> [PUT]
 @app.route('/shop/compare/<int:cmp_id>', methods=['PUT'])
@@ -415,6 +425,7 @@ def update_comparison(cmp_id):
     return render_template('comparison_updated.html', message=f"Comparison {cmp_id} updated successfully",
                            comparison=updated_comparison_items)
 
+
 # shop/compare [POST]
 @app.route('/shop/compare', methods=['POST'])
 def create_comparison():
@@ -426,6 +437,7 @@ def create_comparison():
     db.session.commit()
     return render_template('comparison_created.html', message="New comparison created successfully",
                            comparison=new_comparison_items)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
