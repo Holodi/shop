@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Results</title>
+</head>
+<body>
+    <h1>Comparison Results</h1>
+    <p>Comparing the following products:</p>
+    <ul>
+        {% for product in selected_products %}
+        <li>{{ product }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Attributes Comparison</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Attribute</th>
+                {% for product in selected_products %}
+                <th>{{ product }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for attribute, values in attributes.items() %}
+            <tr>
+                <td>{{ attribute }}</td>
+                {% for value in values %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
