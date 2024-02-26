@@ -439,5 +439,23 @@ def create_comparison():
                            comparison=new_comparison_items)
 
 
+# Функція для відображення результатів пошуку
+@app.route('/shop/search', methods=['POST'])
+def search_items():
+    # Отримати дані для пошуку з тіла запиту
+    data = request.json
+    search_query = data.get('search_query')
+    # Логіка для пошуку товарів за заданим запитом у базі даних
+    items = Items.query.filter(Items.name.ilike(f"%{search_query}%")).all()
+    return render_template('search_results.html', keyword=search_query, search_results=items)
+
+# Функція для відображення результатів порівняння товарів
+@app.route('/shop/compare/<int:cmp_id>', methods=['GET'])
+def get_comparison(cmp_id):
+    comparison_items = Comparison.query.filter_by(cmp_id=cmp_id).all()
+    selected_products = [item.name for item in comparison_items]
+    attributes = {}
+    return render_template('comparison_results.html', selected_products=selected_products, attributes=attributes)
+
 if __name__ == "__main__":
     app.run(debug=True)
