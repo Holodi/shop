@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, render_template, session, g
 from flask_sqlalchemy import SQLAlchemy
 from models import Review, Cart, Favorites, Waitlist, Comparison, User, Order, Items
+from celery import Celery
+from flask_mail import Mail, Message
 import os
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://kholod:12345@localhost/hillel_shop')
@@ -9,6 +12,17 @@ db = SQLAlchemy(app)
 
 app.secret_key = 1111
 
+# Конфігурація для Celery
+app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost:5672//'
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'holod.igor.v.a@gmail.com'
+app.config['MAIL_PASSWORD'] = '12345'
+mail = Mail(app)
 
 # Самописний менеджер контексту
 def before_request():
@@ -456,6 +470,23 @@ def get_comparison(cmp_id):
     selected_products = [item.name for item in comparison_items]
     attributes = {}
     return render_template('comparison_results.html', selected_products=selected_products, attributes=attributes)
+
+# Оголошення функції Celery для відправлення листів
+@celery.task
+def send_order_confirmation_email(user_email, order_details):
+    msg = Message(subject="Order Confirmation", recipients=[user_email])
+    msg.body = f"Thank you for your order. Here are your order details: {order_details}"
+    mail.send(msg)
+
+# Маршрут для оформлення замовлення
+@app.route('/shop/cart/order', methods=['POST'])
+def place_order():
+    order_details = request.form['order_details']
+    user_email = request.form['user_email']
+    # Запуск задачі Celery для відправки листа
+    send_order_confirmation_email.delay(user_email, order_details)
+    return render_template('order_placed.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
